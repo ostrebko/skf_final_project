@@ -13,6 +13,6 @@
    Добавить про метрики качества...
    
    Функцией *draw_predict* можно посмотреть хорошо ли обучилась модель (отображение предсказанных областей и фотографии).  
-   Ноутбук **2_3_Faster_RCNN_blastospores.ipynb** представлен в проекте в папке **part_2_model_training**, а также предварительные результаты обучения модели представлены в [ноутбуке в Google Colab](https://colab.research.google.com/drive/1KhNblnmPao05s1ChQ8mj5cpTTvcvB8FG?usp=sharing).
+   Ноутбук **2_2_Faster_RCNN_blastospores.ipynb** представлен в проекте в папке **part_2_model_training**, а также предварительные результаты обучения модели представлены в [ноутбуке в Google Colab](https://colab.research.google.com/drive/1KhNblnmPao05s1ChQ8mj5cpTTvcvB8FG?usp=sharing).
    
    
