@@ -124,7 +124,8 @@
   *Confusion matrix* представлена на рисунке:  
   ![alt Confusion matrix](https://github.com/ostrebko/skf_final_project/blob/main/part_2_model_training/3_3_confusion_matrix.png)  
   Confusion matrix свидетельствует, о том, что модель ошибается в 11% случаев (пропуск размеченных b_boxes) и верно предсказывает объекты в 89% случаев. Это неплохой результат, который требует улучшения.  
-  В проекте также представлены полученные при обучении графики: *[precision](https://github.com/ostrebko/skf_final_project/blob/main/part_2_model_training/3_4_P_curve.png), [recall](https://github.com/ostrebko/skf_final_project/blob/main/part_2_model_training/3_5_R_curve.png), [precision-recall](https://github.com/ostrebko/skf_final_project/blob/main/part_2_model_training/3_6_PR_curve.png), [f1-score](https://github.com/ostrebko/skf_final_project/blob/main/part_2_model_training/3_7_F1_curve.png)*.
+  В проекте также представлены полученные при обучении графики: *[precision](https://github.com/ostrebko/skf_final_project/blob/main/part_2_model_training/3_4_P_curve.png), [recall](https://github.com/ostrebko/skf_final_project/blob/main/part_2_model_training/3_5_R_curve.png), [precision-recall](https://github.com/ostrebko/skf_final_project/blob/main/part_2_model_training/3_6_PR_curve.png), [f1-score](https://github.com/ostrebko/skf_final_project/blob/main/part_2_model_training/3_7_F1_curve.png), а также [распределения предсказанных bounding-boxes по координатам](https://github.com/ostrebko/skf_final_project/blob/main/part_2_model_training/3_8_labels_correlogram.jpg)*.
+  Веса обученной модели *3_9_best_weights.pt* приложены в папку проекта *part_2_model_training*.  
   
   **Направления для дальнейшего улучшения качества работы модели и всего проекта проекта:**
   - В связи с отсутствием явного переобучения возможно увеличение количества эпох до 600, 1200 и т.п.
