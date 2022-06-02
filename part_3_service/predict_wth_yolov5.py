@@ -10,12 +10,14 @@ import matplotlib.patches as patches
 import torch
 from PIL import Image
 
+root_folder = 'part_3_service'
+path_to_images = os.path.join(root_folder, 'image_folder')
+path_to_predicted_images = os.path.join(root_folder, 'predicted_images')
+path_to_model_dir = os.path.join(root_folder, 'model')
+path_to_yolo5 = os.path.join(root_folder, 'yolov5')
 
-path_to_images = 'image_folder'
-path_to_predicted_images = 'predicted_images'
-path_to_model = os.path.join('model', 'st2_200ep_y5s6_Adam_1.pt')
-path_to_yolo5 = 'yolov5'
-
+model_name = os.listdir(path_to_model_dir)[0]
+path_to_model = os.path.join(path_to_model_dir, model_name)
 
 if os.path.isdir(path_to_predicted_images):
     shutil.rmtree(path_to_predicted_images)
@@ -24,7 +26,8 @@ os.mkdir(path_to_predicted_images)
 
 def create_model(path_to_model):
     #model = torch.hub.load('ultralytics/yolov5', 'custom', path_to_model, device='cpu')
-    model = torch.hub.load(path_to_yolo5, 'custom', path=path_to_model, source='local', device='cpu', force_reload=True)
+    model = torch.hub.load(path_to_yolo5, 'custom', path=path_to_model, source='local', 
+                           device='cpu', force_reload=True)
     return model
 
 
