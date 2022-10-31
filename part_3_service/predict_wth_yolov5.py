@@ -3,6 +3,7 @@ import os
 import glob 
 import time
 import shutil
+import csv
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -10,14 +11,12 @@ import matplotlib.patches as patches
 import torch
 from PIL import Image
 
-root_folder = 'part_3_service'
-path_to_images = os.path.join(root_folder, 'image_folder')
-path_to_predicted_images = os.path.join(root_folder, 'predicted_images')
-path_to_model_dir = os.path.join(root_folder, 'model')
-path_to_yolo5 = os.path.join(root_folder, 'yolov5')
 
-model_name = os.listdir(path_to_model_dir)[0]
-path_to_model = os.path.join(path_to_model_dir, model_name)
+path_to_images = 'image_folder'
+path_to_predicted_images = 'predicted_images'
+path_to_model = os.path.join('model', 'all_stps_y5s6_1291.pt')
+path_to_yolo5 = 'yolov5'
+
 
 if os.path.isdir(path_to_predicted_images):
     shutil.rmtree(path_to_predicted_images)
@@ -25,16 +24,16 @@ os.mkdir(path_to_predicted_images)
 
 
 def create_model(path_to_model):
-    #model = torch.hub.load('ultralytics/yolov5', 'custom', path_to_model, device='cpu')
-    model = torch.hub.load(path_to_yolo5, 'custom', path=path_to_model, source='local', 
-                           device='cpu', force_reload=True)
+    #model = torch.hub.load('ultralytics/yolov5', 'custom', path_to_model, device='cpu', force_reload=True)
+    model = torch.hub.load(path_to_yolo5, 'custom', path=path_to_model, 
+                           source='local', device='cpu', force_reload=True)
     return model
 
 
 model = create_model(path_to_model=path_to_model)
 
 
-def calc_boxes(img_path, width=1280, height=1280, is_draw=False):
+def calc_boxes(img_path, width=640, height=640, is_draw=False):
     
     """Для каждой фото рассчитывается количество бластоспор 
     (предсказание запускается на каждое фото). 
@@ -96,18 +95,25 @@ def calc_boxes(img_path, width=1280, height=1280, is_draw=False):
 def calc_avg_num_blastos(path_to_imgs, is_draw=True):
     start_time = time.time()
     imgs_paths = sorted(glob.glob(os.path.join(path_to_imgs, '*.jpg')), key=str)
-
+    
     numb_images = len(imgs_paths)
     list_to_calc_avg = []
     #is_draw=True
-
-    for num, imge in enumerate(imgs_paths, start=1):
-        print(num, imge)
-        print(f'Фото №{num}/{numb_images},', end=' ') 
-        list_to_calc_avg.append(calc_boxes(imge, is_draw=is_draw))
-
-    print()
-    print(f'Среднее число бластоспор: {int(np.mean(list_to_calc_avg))}')
+    with open('result.csv', 'w', newline='') as csvfile:
+        
+        for num, imge in enumerate(imgs_paths, start=1):
+            print(num, imge)
+            
+            num_blastos = calc_boxes(imge, is_draw=is_draw)
+            print(f'Фото №{num}/{numb_images},', end=' ') 
+            list_to_calc_avg.append(num_blastos)
+            
+            csv_writer = csv.writer(csvfile, delimiter=';')
+            csv_writer.writerow(list([os.path.basename(imge), num_blastos]))
+ 
+        mean_numb_blasto = int(np.mean(list_to_calc_avg))
+        print()
+        print(f'Среднее число бластоспор: {mean_numb_blasto}')
 
     print('Время расчета: %s seconds' % (time.time() - start_time))
 
