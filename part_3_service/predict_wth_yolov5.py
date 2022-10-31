@@ -12,10 +12,10 @@ import torch
 from PIL import Image
 
 
-path_to_images = 'image_folder'
-path_to_predicted_images = 'predicted_images'
-path_to_model = os.path.join('model', 'all_stps_y5s6_1291.pt')
-path_to_yolo5 = 'yolov5'
+path_to_images = 'part_3_service\image_folder'
+path_to_predicted_images = 'part_3_service\predicted_images'
+path_to_model = os.path.join('part_3_service\model', 'all_stps_y5s6_1291.pt')
+path_to_yolo5 = 'part_3_service\yolov5'
 
 
 if os.path.isdir(path_to_predicted_images):
