@@ -12,10 +12,10 @@ import torch
 from PIL import Image
 
 
-path_to_images = 'part_3_service\image_folder'
-path_to_predicted_images = 'part_3_service\predicted_images'
-path_to_model = os.path.join('part_3_service\model', 'all_stps_y5s6_1291.pt')
-path_to_yolo5 = 'part_3_service\yolov5'
+path_to_images = os.path.join('part_3_service', 'image_folder')
+path_to_predicted_images = os.path.join('part_3_service', 'predicted_images')
+path_to_model = os.path.join('part_3_service', 'model', 'all_stps_y5s6_1001.pt')
+path_to_yolo5 = os.path.join('part_3_service', 'yolov5')
 
 
 if os.path.isdir(path_to_predicted_images):
@@ -24,16 +24,18 @@ os.mkdir(path_to_predicted_images)
 
 
 def create_model(path_to_model):
-    #model = torch.hub.load('ultralytics/yolov5', 'custom', path_to_model, device='cpu', force_reload=True)
+    #model = torch.hub.load('ultralytics/yolov5', 'custom', path_to_model, 
+    #                       device='cpu', force_reload=True)
     model = torch.hub.load(path_to_yolo5, 'custom', path=path_to_model, 
                            source='local', device='cpu', force_reload=True)
+    model.max_det = 2000
     return model
 
 
 model = create_model(path_to_model=path_to_model)
 
 
-def calc_boxes(img_path, width=640, height=640, is_draw=False):
+def calc_boxes(img_path, folder_name, model, width=640, height=640, is_draw=False):
     
     """Для каждой фото рассчитывается количество бластоспор 
     (предсказание запускается на каждое фото). 
@@ -42,7 +44,6 @@ def calc_boxes(img_path, width=640, height=640, is_draw=False):
     
     
     img_name = os.path.basename(img_path)
-
 
     original_image = Image.open(img_path)
     w, h = original_image.size
@@ -58,7 +59,7 @@ def calc_boxes(img_path, width=640, height=640, is_draw=False):
         raise RuntimeError('Width or height required!')
  
     resized_image = original_image.resize(max_size, Image.ANTIALIAS)
-    predict_boxes = model(resized_image, size=1280)    
+    predict_boxes = model(resized_image, size=640)    
     
     #image_numpy = cv2.imread(img_path)
     
@@ -85,37 +86,48 @@ def calc_boxes(img_path, width=640, height=640, is_draw=False):
                                      fill = False)
             ax.add_patch(rect)
         
-        save_file = os.path.join(path_to_predicted_images, img_name)
+        save_file = os.path.join(path_to_predicted_images, folder_name, img_name)
         plt.savefig(save_file, bbox_inches='tight', dpi=300)
         plt.close(fig) 
         
     return numb_blasto
 
 
-def calc_avg_num_blastos(path_to_imgs, is_draw=True):
+def calc_avg_num_blastos(path_to_imgs, folder_name, model, is_draw=True):
     start_time = time.time()
-    imgs_paths = sorted(glob.glob(os.path.join(path_to_imgs, '*.jpg')), key=str)
+    imgs_paths = sorted(glob.glob(os.path.join(path_to_imgs, folder_name, '*.jpg')), key=str)
     
     numb_images = len(imgs_paths)
     list_to_calc_avg = []
     #is_draw=True
-    with open('result.csv', 'w', newline='') as csvfile:
+    with open(os.path.join(path_to_predicted_images, folder_name, 
+                           'result_' + str(folder_name) + '.csv'), 
+              'w', newline='') as csvfile:
         
         for num, imge in enumerate(imgs_paths, start=1):
             print(num, imge)
             
-            num_blastos = calc_boxes(imge, is_draw=is_draw)
+            num_blastos = calc_boxes(imge, folder_name, model, is_draw=is_draw)
             print(f'Фото №{num}/{numb_images},', end=' ') 
             list_to_calc_avg.append(num_blastos)
             
             csv_writer = csv.writer(csvfile, delimiter=';')
-            csv_writer.writerow(list([os.path.basename(imge), num_blastos]))
+            csv_writer.writerow(list([os.path.basename(imge), num_blastos, 
+                                      int(num_blastos*0.43)]))
  
         mean_numb_blasto = int(np.mean(list_to_calc_avg))
         print()
         print(f'Среднее число бластоспор: {mean_numb_blasto}')
+        csv_writer.writerow(list(['avrg numb', mean_numb_blasto, 
+                                  int(mean_numb_blasto*0.43)]))
 
     print('Время расчета: %s seconds' % (time.time() - start_time))
 
 
-calc_avg_num_blastos(path_to_images, is_draw=True)
+for fold_name in os.listdir(path_to_images):
+    if os.path.isdir(os.path.join(path_to_predicted_images, fold_name)):
+        shutil.rmtree(os.path.join(path_to_predicted_images, fold_name))
+    os.mkdir(os.path.join(path_to_predicted_images, fold_name))
+    calc_avg_num_blastos(path_to_images, fold_name, model, is_draw=True)
+
+print('Well done!!!')
